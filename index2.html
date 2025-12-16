@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cardápio - Jhonny Bagdá</title>
+  <style>
+    :root {
+      --bg:#121212;
+      --card:#1e1e1e;
+      --accent:#ff6600;
+      --text:#f5f5f5;
+      --muted:#9e9e9e;
+      --danger:#e53935;
+      --warn:#1f9402;
+      --line:#2a2a2a;
+    }
+    body { font-family: Arial, sans-serif; margin:0; background:var(--bg); color:var(--text); }
+
+    /* Logo fixa */
+    .logo {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: var(--card);
+      padding: 22px 16px;
+      text-align: center;
+      box-shadow: 0 2px 12px rgba(0,0,0,.45);
+      z-index: 1000;
+    }
+    .logo h1 { margin:0; color:var(--accent); }
+
+    /* Header normal (desce junto) */
+    header {
+      margin-top: 80px; /* espaço para não cobrir a logo */
+      background:var(--card);
+      padding:16px;
+      text-align:center;
+      box-shadow:0 2px 12px rgba(0,0,0,.25);
+    }
+    header p { margin:8px 0; color:var(--muted); }
+    select { padding:10px; border-radius:8px; border:1px solid var(--line); margin:6px; background:#1a1a1a; color:var(--text); }
+    .btn { border:none; border-radius:8px; padding:10px 14px; cursor:pointer; font-weight:700; display:inline-flex; align-items:center; gap:8px; box-shadow:0 2px 8px rgba(0,0,0,.35); }
+    .btn:active { transform:scale(0.97); }
+    .btn-confirm { background:var(--accent); color:#00110e; }
+    .btn-refresh { background:var(--warn); color:#1a1000; margin-top:10px; }
+
+    /* Abas descem junto */
+    .tabs { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; padding:16px; background:var(--bg); }
+    .tab { padding:10px 16px; cursor:pointer; border-radius:10px; background:#191919; color:var(--text); border:1px solid var(--line); }
+    .tab.active { background:var(--accent); color:#00110e; font-weight:800; border-color:transparent; }
+
+    .menu { padding:16px; max-width:1100px; margin:0 auto; }
+    .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+    .item { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; box-shadow:0 2px 10px rgba(0,0,0,.35); }
+    .item h3 { margin:0 0 6px; font-size:1rem; color:var(--accent); }
+    .price { font-weight:800; color:white; margin-bottom:10px; }
+    .btn-add { background:#007206; color:#e7e7e7; border:1px solid var(--line); }
+    .btn-add:hover { background:#272727; }
+
+    /* Destaque do item selecionado */
+    .item.selected {
+      border:2px solid var(--accent);
+      background:#2a2a2a;
+      transform:scale(1.03);
+      transition:.2s;
+    }
+
+    /* Select de marca de bebida */
+    .brand-select {
+      width:100%;
+      margin-bottom:8px;
+      padding:8px;
+      border-radius:8px;
+      border:1px solid var(--line);
+      background:#1a1a1a;
+      color:var(--text);
+      font-size:.9rem;
+    }
+
+    .cart { background:var(--card); border:1px solid var(--line); margin:18px auto; padding:16px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.35); max-width:800px; }
+    .cart h2 { margin-top:0; font-size:1.1rem; color:var(--accent); }
+    .cart-item { display:flex; justify-content:space-between; align-items:flex-start; padding:8px 0; border-bottom:1px dashed var(--line); gap:8px; }
+    .cart-item:last-child { border-bottom:none; }
+    .cart-actions { display:flex; gap:10px; margin-top:10px; }
+    .btn-remove { background:var(--danger); color:#fff; border:none; padding:4px 8px; border-radius:6px; cursor:pointer; font-size:.8rem; }
+    .btn-clear { background:#333; color:#fff; border:1px solid var(--line); padding:8px 12px; border-radius:8px; cursor:pointer; }
+    .total { font-weight:600; font-size:25px; margin-top:12px; color:white; }
+
+    /* Toast */
+    .toast { position:fixed; bottom:20px; right:20px; background:#222; color:#fff; padding:10px 16px; border-radius:8px; opacity:0; transform:translateY(20px); transition:.3s; font-weight:bold; box-shadow:0 4px 12px rgba(0,0,0,.4); z-index:9999; }
+    .toast.show { opacity:1; transform:translateY(0); }
+
+    /* Botão voltar ao topo */
+    .back-to-top {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--accent);
+      color: #00110e;
+      border: none;
+      border-radius: 50%;
+      padding: 12px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,.35);
+      display: none;
+      z-index: 999;
+    }
+    .back-to-top.show { display: block; }
+
+    /* Compactação leve para telas pequenas sem quebrar 3 colunas */
+    @media(max-width:480px){
+      .item { padding:10px; }
+      .item h3 { font-size:.95rem; }
+      .btn, select { padding:9px 12px; }
+      .grid { gap:10px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Logo fixa -->
+  <div class="logo">
+    <h1>🍔 Jhonny Bagdá</h1>
+  </div>
+
+  <!-- Header normal -->
+  <header>
+    <p>Selecione sua mesa</p>
+    <select id="mesaSelect">
+      <option value="">Selecione a mesa</option>
+      <option value="1">Mesa 1</option>
+      <option value="2">Mesa 2</option>
+      <option value="3">Mesa 3</option>
+      <option value="4">Mesa 4</option>
+      <option value="5">Mesa 5</option>
+      <option value="6">Mesa 6</option>
+    </select>
+    <button class="btn btn-confirm" id="confirmarMesa">✅ Confirmar</button>
+    <div>
+      <button class="btn btn-refresh" id="btnRefresh">🔄 Atualizar página</button>
+    </div>
+  </header>
+
+  <div class="tabs" id="tabs"></div>
+  <section class="menu" id="menu"></section>
+
+  <section class="cart">
+    <h2>🛒 Seus pedidos</h2>
+    <div id="cartItems"></div>
+    <div class="total">Total: R$ <span id="total">0,00</span></div>
+    <div class="cart-actions">
+      <button class="btn-clear" id="clearCart">🗑️ Limpar carrinho</button>
+    </div>
+  </section>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- Botão voltar ao topo -->
+  <button id="backToTop" class="back-to-top"><b style="font-size: 30px;">⬆</b></button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDUhKpLopIApQaiEoGaxBXjZzmkROvdaJI",
+      authDomain: "app-de-demandas.firebaseapp.com",
+      projectId: "app-de-demandas",
+      storageBucket: "app-de-demandas.appspot.com",
+      messagingSenderId: "857555550806",
+      appId: "1:857555550806:web:e7cb602c680585f6c171f7",
+      measurementId: "G-MZP03Y2R4J"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Cardápio completo (com bebidas detalhadas com marcas)
+    const categorias = {
+      "Lanches": [
+        { nome:"Misto", preco:6 }, { nome:"Americano", preco:10 }, { nome:"X-Salsicha", preco:12 },
+        { nome:"Bauru Simples", preco:12 }, { nome:"Bauru Especial", preco:14 }, { nome:"Hambúrguer", preco:14 },
+        { nome:"X-Catupiry", preco:14 }, { nome:"X-Salada Simples", preco:14 }, { nome:"X-Abacaxi", preco:16 },
+        { nome:"X-Salada Especial", preco:15 }, { nome:"X-Banana", preco:16 }, { nome:"X-Calabresa Simples", preco:15 },
+        { nome:"X-Calabresa Especial", preco:17 }, { nome:"X-Bacon", preco:17 }, { nome:"X-Frango Simples", preco:15 },
+        { nome:"X-Frango Especial", preco:17 }, { nome:"X-Tudo", preco:18 }, { nome:"X-Filé", preco:25 },
+        { nome:"X-Jhone Broca", preco:22 }, { nome:"X-Completação", preco:26 },
+        { nome:"X-Arrisca", preco:28 }
+      ],
+      "Bebidas": [
+        // Refrigerantes com marcas
+        { 
+          nome:"Refrigerante 250ml", preco:4,
+          marcas:["Coca-Cola","Guaraná Antártica","Fanta","River"]
+        },
+        { 
+          nome:"Refrigerante Lata 350ml", preco:6,
+          marcas:["Coca-Cola","Guaraná Antártica","Fanta","Sprite","Gua.Jesus"]
+        },
+        { 
+          nome:"Refrigerante 600ml", preco:7,
+          marcas:["Coca-Cola","Guaraná Antártica","Fanta","River"]
+        },
+        { 
+          nome:"Refrigerante 1L", preco:10,
+          marcas:["Coca-Cola","Guaraná Antártica","Fanta","River"]
+        },
+        { 
+          nome:"Refrigerante 1,5L", preco:11,
+          marcas:["Coca-Cola","Fanta"]
+        },
+        { 
+          nome:"Refrigerante 2L", preco:13,
+          marcas:["Coca-Cola","Guaraná Antártica","Fanta","River","Coca Zero","Fanta Uva"]
+        },
+        // Sucos (do outro cardápio)
+        { nome:"Suco de Acerola", preco:6 },
+        { nome:"Suco de Maracujá", preco:6 },
+        { nome:"Suco de Cupuaçu", preco:7 },
+        { nome:"Suco de Laranja 450ml", preco:8 },
+        // Vitamina já existia
+        { nome:"Vitamina de Cupuaçu", preco:7 }
+      ],
+      "Porções": [
+        { nome:"Porção de batata frita", preco:17 }
+      ],
+      "Adicionais": [
+        { nome:"Bacon", preco:3 }, { nome:"Calabresa", preco:2 }, { nome:"Cheddar", preco:2 },
+        { nome:"Carne de Hambúrguer", preco:5 }, { nome:"Filé de Frango", preco:5 },
+        { nome:"Filé", preco:7 }, { nome:"Presunto", preco:2 }, { nome:"Queijo", preco:2 }, { nome:"Ovo", preco:2 },
+        { nome:"Salsicha", preco:1 }, { nome:"Alface", preco:1 }, { nome:"Tomate", preco:1 }, { nome:"Cebola", preco:2 },
+        { nome:"Banana", preco:3 }, { nome:"Catupiry", preco:2 }, { nome:"Mostarda", preco:1 },
+        { nome:"Barbecue", preco:1 }, { nome:"Maionese Temperada", preco:1 }
+      ]
+    };
+
+    // Elementos
+    const tabsEl = document.getElementById('tabs');
+    const menuEl = document.getElementById('menu');
+    const cartItems = document.getElementById('cartItems');
+    const totalEl = document.getElementById('total');
+    const toastEl = document.getElementById('toast');
+    const refreshBtn = document.getElementById('btnRefresh');
+    const clearCartBtn = document.getElementById('clearCart');
+    const backToTopBtn = document.getElementById('backToTop');
+
+    // Estado
+    let cart = [];
+    let mesaSelecionada = "";
+    let categoriaAtiva = null;
+    let lancheSelecionadoParaAdicional = null;
+
+    // Toast
+    function showToast(text){
+      toastEl.textContent = text;
+      toastEl.classList.add('show');
+      setTimeout(()=> toastEl.classList.remove('show'), 1500);
+    }
+
+    // Render abas
+    function renderTabs() {
+      tabsEl.innerHTML = '';
+      const keys = Object.keys(categorias);
+      keys.forEach((cat, idx) => {
+        const tab = document.createElement('div');
+        tab.className = 'tab' + (idx===0 ? ' active' : '');
+        tab.textContent = cat;
+        tab.onclick = () => {
+          document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+          tab.classList.add('active');
+          categoriaAtiva = cat;
+          renderMenu(cat);
+        };
+        tabsEl.appendChild(tab);
+      });
+      categoriaAtiva = keys[0];
+      renderMenu(categoriaAtiva);
+    }
+
+    // Render menu da aba
+    function renderMenu(cat) {
+      menuEl.innerHTML = '';
+      const grid = document.createElement('div');
+      grid.className = 'grid';
+
+      categorias[cat].forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'item';
+
+        // Bebidas com seleção de marca
+        if (cat === 'Bebidas' && Array.isArray(item.marcas)) {
+          const selectId = 'marca-' + item.nome.replace(/\s+/g,'-') + '-' + Math.random().toString(36).slice(2);
+          div.innerHTML = `
+            <h3>${item.nome}</h3>
+            <p class="price">R$ ${Number(item.preco).toFixed(2)}</p>
+            <select class="brand-select" id="${selectId}">
+              <option value="">ESCOLHA A MARCA</option>
+              ${item.marcas.map(m => `<option value="${m}">${m}</option>`).join('')}
+            </select>
+            <button class="btn btn-add">➕ Adicionar</button>
+          `;
+          const btn = div.querySelector('button');
+          const selectEl = div.querySelector('select');
+          btn.onclick = () => {
+            if (!selectEl.value) {
+              showToast("Escolha a marca do refrigerante!");
+              return;
+            }
+            document.querySelectorAll('.item').forEach(i => i.classList.remove('selected'));
+            div.classList.add('selected');
+            addToCart({ ...item, categoria: cat, marca: selectEl.value });
+          };
+        } else {
+          // Itens normais
+          div.innerHTML = `
+            <h3>${item.nome}</h3>
+            <p class="price">R$ ${Number(item.preco).toFixed(2)}</p>
+            <button class="btn btn-add">➕ Adicionar</button>
+          `;
+          const btn = div.querySelector('button');
+
+          if (cat === 'Adicionais') {
+            btn.onclick = () => {
+              addAdicional({ ...item, categoria: cat });
+            };
+          } else {
+            btn.onclick = () => {
+              document.querySelectorAll('.item').forEach(i => i.classList.remove('selected'));
+              div.classList.add('selected');
+              addToCart({ ...item, categoria: cat });
+            };
+          }
+        }
+
+        grid.appendChild(div);
+      });
+
+      menuEl.appendChild(grid);
+    }
+
+    // Adicionar item principal ao carrinho e salvar no Firestore
+    async function addToCart(item) {
+      if (!mesaSelecionada) {
+        showToast("Confirme sua mesa primeiro!");
+        return;
+      }
+
+      const grupo = {
+        id: Date.now() + Math.random(),
+        nome: item.nome,
+        preco: item.preco,
+        categoria: item.categoria,
+        marca: item.marca || null,
+        adicionais: []
+      };
+
+      cart.push(grupo);
+
+      if (item.categoria === 'Lanches') {
+        lancheSelecionadoParaAdicional = grupo;
+      }
+
+      renderCart();
+      const label = item.marca ? `${item.nome} - ${item.marca}` : item.nome;
+      showToast(`Adicionado: ${label}`);
+
+      try {
+        await addDoc(collection(db, "pedidos"), {
+          mesa: mesaSelecionada,
+          nome: item.nome,
+          categoria: item.categoria,
+          preco: item.preco,
+          marca: item.marca || null,
+          timestamp: new Date(),
+          grupoId: grupo.id
+        });
+      } catch (e) {
+        console.error("Erro ao salvar pedido:", e);
+      }
+    }
+
+    // Adicionar adicional ao último lanche selecionado
+    async function addAdicional(adicional) {
+      if (!mesaSelecionada) {
+        showToast("Confirme sua mesa primeiro!");
+        return;
+      }
+
+      if (!lancheSelecionadoParaAdicional) {
+        showToast("Escolha um lanche antes de adicionar adicionais!");
+        return;
+      }
+
+      lancheSelecionadoParaAdicional.adicionais.push({
+        nome: adicional.nome,
+        preco: adicional.preco
+      });
+
+      renderCart();
+      showToast(`Adicional adicionado: ${adicional.nome}`);
+
+      try {
+        await addDoc(collection(db, "pedidos"), {
+          mesa: mesaSelecionada,
+          nome: adicional.nome,
+          categoria: "Adicional",
+          preco: adicional.preco,
+          timestamp: new Date(),
+          grupoId: lancheSelecionadoParaAdicional.id
+        });
+      } catch (e) {
+        console.error("Erro ao salvar adicional:", e);
+      }
+    }
+
+    // Remover grupo (lanche/bebida + adicionais) do carrinho
+    function removeFromCart(index){
+      const removed = cart.splice(index,1)[0];
+      renderCart();
+      if(removed) {
+        const label = removed.marca ? `${removed.nome} - ${removed.marca}` : removed.nome;
+        showToast(`Removido: ${label}`);
+      }
+    }
+
+    // Limpar carrinho
+    function clearCart(){
+      cart = [];
+      lancheSelecionadoParaAdicional = null;
+      renderCart();
+      showToast('Carrinho limpo');
+    }
+
+    // Renderizar carrinho
+    function renderCart() {
+      cartItems.innerHTML = '';
+      let total = 0;
+
+      cart.forEach((it, idx) => {
+        const row = document.createElement('div');
+        row.className = 'cart-item';
+
+        const precoBase = Number(it.preco) || 0;
+        let adicionaisTotal = 0;
+        let adicionaisHtml = '';
+
+        if (Array.isArray(it.adicionais) && it.adicionais.length > 0) {
+          adicionaisHtml += `<div style="margin-top:4px; font-size:0.85rem; color:#ccc;">`;
+          it.adicionais.forEach(add => {
+            const p = Number(add.preco) || 0;
+            adicionaisTotal += p;
+            adicionaisHtml += `<div>+ ${add.nome} — R$ ${p.toFixed(2)}</div>`;
+          });
+          adicionaisHtml += `</div>`;
+        }
+
+        const precoGrupo = precoBase + adicionaisTotal;
+        const titulo = it.marca ? `${it.nome} - ${it.marca}` : it.nome;
+
+        row.innerHTML = `
+          <div style="flex:1; display:flex; flex-direction:column;">
+            <span><b>${titulo}</b></span>
+            ${adicionaisHtml}
+          </div>
+          <span>R$ ${precoGrupo.toFixed(2)}</span>
+          <button class="btn-remove">Remover</button>
+        `;
+
+        row.querySelector('.btn-remove').onclick = () => removeFromCart(idx);
+        cartItems.appendChild(row);
+
+        total += precoGrupo;
+      });
+
+      totalEl.textContent = total.toFixed(2);
+    }
+
+    // Confirmar mesa
+    document.getElementById('confirmarMesa').onclick = () => {
+      const mesa = document.getElementById('mesaSelect').value;
+      if (!mesa) {
+        showToast("Selecione a mesa!");
+        return;
+      }
+      mesaSelecionada = mesa;
+      document.getElementById('mesaSelect').disabled = true;
+      document.getElementById('confirmarMesa').disabled = true;
+      showToast(`Mesa ${mesaSelecionada} confirmada`);
+    };
+
+    // Atualizar página
+    refreshBtn.onclick = () => location.reload();
+
+    // Limpar carrinho
+    clearCartBtn.onclick = clearCart;
+
+    // Voltar ao topo
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 50) {
+        backToTopBtn.classList.add("show");
+      } else {
+        backToTopBtn.classList.remove("show");
+      }
+    });
+    backToTopBtn.onclick = () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    // Inicializar
+    renderTabs();
+  </script>
+</body>
+</html>
