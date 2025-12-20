@@ -160,354 +160,357 @@
   <button id="backToTop" class="back-to-top"><b style="font-size: 30px;">⬆</b></button>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDUhKpLopIApQaiEoGaxBXjZzmkROvdaJI",
-      authDomain: "app-de-demandas.firebaseapp.com",
-      projectId: "app-de-demandas",
-      storageBucket: "app-de-demandas.appspot.com",
-      messagingSenderId: "857555550806",
-      appId: "1:857555550806:web:e7cb602c680585f6c171f7",
-      measurementId: "G-MZP03Y2R4J"
-    };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  // Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyDUhKpLopIApQaiEoGaxBXjZzmkROvdaJI",
+    authDomain: "app-de-demandas.firebaseapp.com",
+    projectId: "app-de-demandas",
+    storageBucket: "app-de-demandas.appspot.com",
+    messagingSenderId: "857555550806",
+    appId: "1:857555550806:web:e7cb602c680585f6c171f7",
+    measurementId: "G-MZP03Y2R4J"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-    // Cardápio completo (com bebidas detalhadas com marcas)
-    const categorias = {
-      "Lanches": [
-        { nome:"Misto", preco:6 }, { nome:"Americano", preco:10 }, { nome:"X-Salsicha", preco:12 },
-        { nome:"Bauru Simples", preco:12 }, { nome:"Bauru Especial", preco:14 }, { nome:"Hambúrguer", preco:14 },
-        { nome:"X-Catupiry", preco:14 }, { nome:"X-Salada Simples", preco:14 }, { nome:"X-Abacaxi", preco:16 },
-        { nome:"X-Salada Especial", preco:15 }, { nome:"X-Banana", preco:16 }, { nome:"X-Calabresa Simples", preco:15 },
-        { nome:"X-Calabresa Especial", preco:17 }, { nome:"X-Bacon", preco:17 }, { nome:"X-Frango Simples", preco:15 },
-        { nome:"X-Frango Especial", preco:17 }, { nome:"X-Tudo", preco:18 }, { nome:"X-Filé", preco:25 },
-        { nome:"X-Jhone Broca", preco:22 }, { nome:"X-Completação", preco:26 },
-        { nome:"X-Arrisca", preco:28 }
-      ],
-      "Bebidas": [
-        // Refrigerantes com marcas
-        { 
-          nome:"Refrigerante 250ml", preco:4,
-          marcas:["Coca-Cola","Guaraná Antártica","Fanta","River"]
-        },
-        { 
-          nome:"Refrigerante Lata 350ml", preco:6,
-          marcas:["Coca-Cola","Guaraná Antártica","Fanta","Sprite","Gua.Jesus"]
-        },
-        { 
-          nome:"Refrigerante 600ml", preco:7,
-          marcas:["Coca-Cola","Guaraná Antártica","Fanta","River"]
-        },
-        { 
-          nome:"Refrigerante 1L", preco:10,
-          marcas:["Coca-Cola","Guaraná Antártica","Fanta","River"]
-        },
-        { 
-          nome:"Refrigerante 1,5L", preco:11,
-          marcas:["Coca-Cola","Fanta"]
-        },
-        { 
-          nome:"Refrigerante 2L", preco:13,
-          marcas:["Coca-Cola","Guaraná Antártica","Fanta","River","Coca Zero","Fanta Uva"]
-        },
-        // Sucos (do outro cardápio)
-        { nome:"Suco de Acerola", preco:6 },
-        { nome:"Suco de Maracujá", preco:6 },
-        { nome:"Suco de Cupuaçu", preco:7 },
-        { nome:"Suco de Laranja 450ml", preco:8 },
-        // Vitamina já existia
-        { nome:"Vitamina de Cupuaçu", preco:7 }
-      ],
-      "Porções": [
-        { nome:"Porção de batata frita", preco:17 }
-      ],
-      "Adicionais": [
-        { nome:"Bacon", preco:3 }, { nome:"Calabresa", preco:2 }, { nome:"Cheddar", preco:2 },
-        { nome:"Carne de Hambúrguer", preco:5 }, { nome:"Filé de Frango", preco:5 },
-        { nome:"Filé", preco:7 }, { nome:"Presunto", preco:2 }, { nome:"Queijo", preco:2 }, { nome:"Ovo", preco:2 },
-        { nome:"Salsicha", preco:1 }, { nome:"Alface", preco:1 }, { nome:"Tomate", preco:1 }, { nome:"Cebola", preco:2 },
-        { nome:"Banana", preco:3 }, { nome:"Catupiry", preco:2 }, { nome:"Mostarda", preco:1 },
-        { nome:"Barbecue", preco:1 }, { nome:"Maionese Temperada", preco:1 }
-      ]
-    };
+  // Cardápio
+  const categorias = {
+    "Lanches": [
+      { nome:"Misto", preco:6 }, { nome:"Americano", preco:10 }, { nome:"X-Salsicha", preco:12 },
+      { nome:"Bauru Simples", preco:12 }, { nome:"Bauru Especial", preco:14 }, { nome:"Hambúrguer", preco:14 },
+      { nome:"X-Catupiry", preco:14 }, { nome:"X-Salada Simples", preco:14 }, { nome:"X-Abacaxi", preco:16 },
+      { nome:"X-Salada Especial", preco:15 }, { nome:"X-Banana", preco:16 }, { nome:"X-Calabresa Simples", preco:15 },
+      { nome:"X-Calabresa Especial", preco:17 }, { nome:"X-Bacon", preco:17 }, { nome:"X-Frango Simples", preco:15 },
+      { nome:"X-Frango Especial", preco:17 }, { nome:"X-Tudo", preco:18 }, { nome:"X-Filé", preco:25 },
+      { nome:"X-Jhone Broca", preco:22 }, { nome:"X-Completação", preco:26 },
+      { nome:"X-Arrisca", preco:28 }
+    ],
+    "Bebidas": [
+      { nome:"Refrigerante 250ml", preco:4, marcas:["Coca-Cola","Guaraná Antártica","Fanta","River"] },
+      { nome:"Refrigerante Lata 350ml", preco:6, marcas:["Coca-Cola","Guaraná Antártica","Fanta","Sprite","Gua.Jesus"] },
+      { nome:"Refrigerante 600ml", preco:7, marcas:["Coca-Cola","Guaraná Antártica","Fanta","River"] },
+      { nome:"Refrigerante 1L", preco:10, marcas:["Coca-Cola","Guaraná Antártica","Fanta","River"] },
+      { nome:"Refrigerante 1,5L", preco:11, marcas:["Coca-Cola","Fanta"] },
+      { nome:"Refrigerante 2L", preco:13, marcas:["Coca-Cola","Guaraná Antártica","Fanta","River","Coca Zero","Fanta Uva"] },
+      { nome:"Suco de Acerola", preco:6 },
+      { nome:"Suco de Maracujá", preco:6 },
+      { nome:"Suco de Cupuaçu", preco:7 },
+      { nome:"Suco de Laranja 450ml", preco:8 },
+      { nome:"Vitamina de Cupuaçu", preco:7 }
+    ],
+    "Porções": [
+      { nome:"Porção de batata frita", preco:17 }
+    ],
+    "Adicionais": [
+      { nome:"Bacon", preco:3 }, { nome:"Calabresa", preco:2 }, { nome:"Cheddar", preco:2 },
+      { nome:"Carne de Hambúrguer", preco:5 }, { nome:"Filé de Frango", preco:5 },
+      { nome:"Filé", preco:7 }, { nome:"Presunto", preco:2 }, { nome:"Queijo", preco:2 }, { nome:"Ovo", preco:2 },
+      { nome:"Salsicha", preco:1 }, { nome:"Alface", preco:1 }, { nome:"Tomate", preco:1 }, { nome:"Cebola", preco:2 },
+      { nome:"Banana", preco:3 }, { nome:"Catupiry", preco:2 }, { nome:"Mostarda", preco:1 },
+      { nome:"Barbecue", preco:1 }, { nome:"Maionese Temperada", preco:1 }
+    ]
+  };
 
-    // Elementos
-    const tabsEl = document.getElementById('tabs');
-    const menuEl = document.getElementById('menu');
-    const cartItems = document.getElementById('cartItems');
-    const totalEl = document.getElementById('total');
-    const toastEl = document.getElementById('toast');
-    const refreshBtn = document.getElementById('btnRefresh');
-    const clearCartBtn = document.getElementById('clearCart');
-    const backToTopBtn = document.getElementById('backToTop');
+  // Elementos
+  const tabsEl = document.getElementById('tabs');
+  const menuEl = document.getElementById('menu');
+  const cartItems = document.getElementById('cartItems');
+  const totalEl = document.getElementById('total');
+  const toastEl = document.getElementById('toast');
+  const refreshBtn = document.getElementById('btnRefresh');
+  const clearCartBtn = document.getElementById('clearCart');
+  const backToTopBtn = document.getElementById('backToTop');
 
-    // Estado
-    let cart = [];
-    let mesaSelecionada = "";
-    let categoriaAtiva = null;
-    let lancheSelecionadoParaAdicional = null;
+  // Estado
+  let cart = [];
+  let mesaSelecionada = "";
+  let categoriaAtiva = null;
+  let lancheSelecionadoParaAdicional = null;
 
-    // Toast
-    function showToast(text){
-      toastEl.textContent = text;
-      toastEl.classList.add('show');
-      setTimeout(()=> toastEl.classList.remove('show'), 1500);
-    }
+  // Toast
+  function showToast(text){
+    toastEl.textContent = text;
+    toastEl.classList.add('show');
+    setTimeout(()=> toastEl.classList.remove('show'), 1500);
+  }
 
-    // Render abas
-    function renderTabs() {
-      tabsEl.innerHTML = '';
-      const keys = Object.keys(categorias);
-      keys.forEach((cat, idx) => {
-        const tab = document.createElement('div');
-        tab.className = 'tab' + (idx===0 ? ' active' : '');
-        tab.textContent = cat;
-        tab.onclick = () => {
-          document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-          tab.classList.add('active');
-          categoriaAtiva = cat;
-          renderMenu(cat);
+  // Abas
+  function renderTabs() {
+    tabsEl.innerHTML = '';
+    const keys = Object.keys(categorias);
+    keys.forEach((cat, idx) => {
+      const tab = document.createElement('div');
+      tab.className = 'tab' + (idx===0 ? ' active' : '');
+      tab.textContent = cat;
+      tab.onclick = () => {
+        document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+        tab.classList.add('active');
+        categoriaAtiva = cat;
+        renderMenu(cat);
+      };
+      tabsEl.appendChild(tab);
+    });
+    categoriaAtiva = keys[0];
+    renderMenu(categoriaAtiva);
+  }
+
+  // Menu
+  function renderMenu(cat) {
+    menuEl.innerHTML = '';
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+
+    categorias[cat].forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'item';
+
+      // Bebidas com marca
+      if (cat === 'Bebidas' && Array.isArray(item.marcas)) {
+        const selectId = 'marca-' + item.nome.replace(/\s+/g,'-') + '-' + Math.random().toString(36).slice(2);
+        div.innerHTML = `
+          <h3>${item.nome}</h3>
+          <p class="price">R$ ${Number(item.preco).toFixed(2)}</p>
+          <select class="brand-select" id="${selectId}">
+            <option value="">ESCOLHA A MARCA</option>
+            ${item.marcas.map(m => `<option value="${m}">${m}</option>`).join('')}
+          </select>
+          <button class="btn btn-add">➕ Adicionar</button>
+        `;
+        const btn = div.querySelector('button');
+        const selectEl = div.querySelector('select');
+        btn.onclick = () => {
+          if (!selectEl.value) {
+            showToast("Escolha a marca do refrigerante!");
+            return;
+          }
+          document.querySelectorAll('.item').forEach(i => i.classList.remove('selected'));
+          div.classList.add('selected');
+          addToCart({ ...item, categoria: cat, marca: selectEl.value });
         };
-        tabsEl.appendChild(tab);
-      });
-      categoriaAtiva = keys[0];
-      renderMenu(categoriaAtiva);
-    }
+      } else if (cat === 'Lanches') {
+        // Lanches com observação
+        div.innerHTML = `
+          <h3>${item.nome}</h3>
+          <p class="price">R$ ${Number(item.preco).toFixed(2)}</p>
+          <textarea class="obs-input" placeholder="Observação (ex: sem cebola)"></textarea>
+          <button class="btn btn-add">➕ Adicionar</button>
+        `;
+        const btn = div.querySelector('button');
+        const obsEl = div.querySelector('.obs-input');
+        btn.onclick = () => {
+          document.querySelectorAll('.item').forEach(i => i.classList.remove('selected'));
+          div.classList.add('selected');
+          addToCart({ ...item, categoria: cat, observacao: (obsEl.value || "").trim() });
+        };
+      } else {
+        // Itens normais
+        div.innerHTML = `
+          <h3>${item.nome}</h3>
+          <p class="price">R$ ${Number(item.preco).toFixed(2)}</p>
+          <button class="btn btn-add">➕ Adicionar</button>
+        `;
+        const btn = div.querySelector('button');
 
-    // Render menu da aba
-    function renderMenu(cat) {
-      menuEl.innerHTML = '';
-      const grid = document.createElement('div');
-      grid.className = 'grid';
-
-      categorias[cat].forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'item';
-
-        // Bebidas com seleção de marca
-        if (cat === 'Bebidas' && Array.isArray(item.marcas)) {
-          const selectId = 'marca-' + item.nome.replace(/\s+/g,'-') + '-' + Math.random().toString(36).slice(2);
-          div.innerHTML = `
-            <h3>${item.nome}</h3>
-            <p class="price">R$ ${Number(item.preco).toFixed(2)}</p>
-            <select class="brand-select" id="${selectId}">
-              <option value="">ESCOLHA A MARCA</option>
-              ${item.marcas.map(m => `<option value="${m}">${m}</option>`).join('')}
-            </select>
-            <button class="btn btn-add">➕ Adicionar</button>
-          `;
-          const btn = div.querySelector('button');
-          const selectEl = div.querySelector('select');
+        if (cat === 'Adicionais') {
           btn.onclick = () => {
-            if (!selectEl.value) {
-              showToast("Escolha a marca do refrigerante!");
-              return;
-            }
-            document.querySelectorAll('.item').forEach(i => i.classList.remove('selected'));
-            div.classList.add('selected');
-            addToCart({ ...item, categoria: cat, marca: selectEl.value });
+            addAdicional({ ...item, categoria: cat });
           };
         } else {
-          // Itens normais
-          div.innerHTML = `
-            <h3>${item.nome}</h3>
-            <p class="price">R$ ${Number(item.preco).toFixed(2)}</p>
-            <button class="btn btn-add">➕ Adicionar</button>
-          `;
-          const btn = div.querySelector('button');
-
-          if (cat === 'Adicionais') {
-            btn.onclick = () => {
-              addAdicional({ ...item, categoria: cat });
-            };
-          } else {
-            btn.onclick = () => {
-              document.querySelectorAll('.item').forEach(i => i.classList.remove('selected'));
-              div.classList.add('selected');
-              addToCart({ ...item, categoria: cat });
-            };
-          }
+          btn.onclick = () => {
+            document.querySelectorAll('.item').forEach(i => i.classList.remove('selected'));
+            div.classList.add('selected');
+            addToCart({ ...item, categoria: cat });
+          };
         }
-
-        grid.appendChild(div);
-      });
-
-      menuEl.appendChild(grid);
-    }
-
-    // Adicionar item principal ao carrinho e salvar no Firestore
-    async function addToCart(item) {
-      if (!mesaSelecionada) {
-        showToast("Confirme sua mesa primeiro!");
-        return;
       }
 
-      const grupo = {
-        id: Date.now() + Math.random(),
-        nome: item.nome,
-        preco: item.preco,
-        categoria: item.categoria,
-        marca: item.marca || null,
-        adicionais: []
-      };
-
-      cart.push(grupo);
-
-      if (item.categoria === 'Lanches') {
-        lancheSelecionadoParaAdicional = grupo;
-      }
-
-      renderCart();
-      const label = item.marca ? `${item.nome} - ${item.marca}` : item.nome;
-      showToast(`Adicionado: ${label}`);
-
-      try {
-        await addDoc(collection(db, "pedidos"), {
-          mesa: mesaSelecionada,
-          nome: item.nome,
-          categoria: item.categoria,
-          preco: item.preco,
-          marca: item.marca || null,
-          timestamp: new Date(),
-          grupoId: grupo.id
-        });
-      } catch (e) {
-        console.error("Erro ao salvar pedido:", e);
-      }
-    }
-
-    // Adicionar adicional ao último lanche selecionado
-    async function addAdicional(adicional) {
-      if (!mesaSelecionada) {
-        showToast("Confirme sua mesa primeiro!");
-        return;
-      }
-
-      if (!lancheSelecionadoParaAdicional) {
-        showToast("Escolha um lanche antes de adicionar adicionais!");
-        return;
-      }
-
-      lancheSelecionadoParaAdicional.adicionais.push({
-        nome: adicional.nome,
-        preco: adicional.preco
-      });
-
-      renderCart();
-      showToast(`Adicional adicionado: ${adicional.nome}`);
-
-      try {
-        await addDoc(collection(db, "pedidos"), {
-          mesa: mesaSelecionada,
-          nome: adicional.nome,
-          categoria: "Adicional",
-          preco: adicional.preco,
-          timestamp: new Date(),
-          grupoId: lancheSelecionadoParaAdicional.id
-        });
-      } catch (e) {
-        console.error("Erro ao salvar adicional:", e);
-      }
-    }
-
-    // Remover grupo (lanche/bebida + adicionais) do carrinho
-    function removeFromCart(index){
-      const removed = cart.splice(index,1)[0];
-      renderCart();
-      if(removed) {
-        const label = removed.marca ? `${removed.nome} - ${removed.marca}` : removed.nome;
-        showToast(`Removido: ${label}`);
-      }
-    }
-
-    // Limpar carrinho
-    function clearCart(){
-      cart = [];
-      lancheSelecionadoParaAdicional = null;
-      renderCart();
-      showToast('Carrinho limpo');
-    }
-
-    // Renderizar carrinho
-    function renderCart() {
-      cartItems.innerHTML = '';
-      let total = 0;
-
-      cart.forEach((it, idx) => {
-        const row = document.createElement('div');
-        row.className = 'cart-item';
-
-        const precoBase = Number(it.preco) || 0;
-        let adicionaisTotal = 0;
-        let adicionaisHtml = '';
-
-        if (Array.isArray(it.adicionais) && it.adicionais.length > 0) {
-          adicionaisHtml += `<div style="margin-top:4px; font-size:0.85rem; color:#ccc;">`;
-          it.adicionais.forEach(add => {
-            const p = Number(add.preco) || 0;
-            adicionaisTotal += p;
-            adicionaisHtml += `<div>+ ${add.nome} — R$ ${p.toFixed(2)}</div>`;
-          });
-          adicionaisHtml += `</div>`;
-        }
-
-        const precoGrupo = precoBase + adicionaisTotal;
-        const titulo = it.marca ? `${it.nome} - ${it.marca}` : it.nome;
-
-        row.innerHTML = `
-          <div style="flex:1; display:flex; flex-direction:column;">
-            <span><b>${titulo}</b></span>
-            ${adicionaisHtml}
-          </div>
-          <span>R$ ${precoGrupo.toFixed(2)}</span>
-          <button class="btn-remove">Remover</button>
-        `;
-
-        row.querySelector('.btn-remove').onclick = () => removeFromCart(idx);
-        cartItems.appendChild(row);
-
-        total += precoGrupo;
-      });
-
-      totalEl.textContent = total.toFixed(2);
-    }
-
-    // Confirmar mesa
-    document.getElementById('confirmarMesa').onclick = () => {
-      const mesa = document.getElementById('mesaSelect').value;
-      if (!mesa) {
-        showToast("Selecione a mesa!");
-        return;
-      }
-      mesaSelecionada = mesa;
-      document.getElementById('mesaSelect').disabled = true;
-      document.getElementById('confirmarMesa').disabled = true;
-      showToast(`Mesa ${mesaSelecionada} confirmada`);
-    };
-
-    // Atualizar página
-    refreshBtn.onclick = () => location.reload();
-
-    // Limpar carrinho
-    clearCartBtn.onclick = clearCart;
-
-    // Voltar ao topo
-    window.addEventListener("scroll", () => {
-      if (window.scrollY > 50) {
-        backToTopBtn.classList.add("show");
-      } else {
-        backToTopBtn.classList.remove("show");
-      }
+      grid.appendChild(div);
     });
-    backToTopBtn.onclick = () => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+
+    menuEl.appendChild(grid);
+  }
+
+  // Add item principal
+  async function addToCart(item) {
+    if (!mesaSelecionada) {
+      showToast("Confirme sua mesa primeiro!");
+      return;
+    }
+
+    const grupo = {
+      id: Date.now() + Math.random(),
+      nome: item.nome,
+      preco: item.preco,
+      categoria: item.categoria,
+      marca: item.marca || null,
+      observacao: item.observacao || null,
+      adicionais: []
     };
 
-    // Inicializar
-    renderTabs();
-  </script>
+    cart.push(grupo);
+
+    if (item.categoria === 'Lanches') {
+      lancheSelecionadoParaAdicional = grupo;
+    }
+
+    renderCart();
+    const label = item.marca ? `${item.nome} - ${item.marca}` : item.nome;
+    showToast(`Adicionado: ${label}`);
+
+    try {
+      await addDoc(collection(db, "pedidos"), {
+        mesa: mesaSelecionada,
+        nome: item.nome,
+        categoria: item.categoria,
+        preco: item.preco,
+        marca: item.marca || null,
+        observacao: item.observacao || null,
+        timestamp: new Date(),
+        grupoId: grupo.id
+      });
+    } catch (e) {
+      console.error("Erro ao salvar pedido:", e);
+    }
+  }
+
+  // Add adicional
+  async function addAdicional(adicional) {
+    if (!mesaSelecionada) {
+      showToast("Confirme sua mesa primeiro!");
+      return;
+    }
+
+    if (!lancheSelecionadoParaAdicional) {
+      showToast("Escolha um lanche antes de adicionar adicionais!");
+      return;
+    }
+
+    lancheSelecionadoParaAdicional.adicionais.push({
+      nome: adicional.nome,
+      preco: adicional.preco
+    });
+
+    renderCart();
+    showToast(`Adicional adicionado: ${adicional.nome}`);
+
+    try {
+      await addDoc(collection(db, "pedidos"), {
+        mesa: mesaSelecionada,
+        nome: adicional.nome,
+        categoria: "Adicional",
+        preco: adicional.preco,
+        timestamp: new Date(),
+        grupoId: lancheSelecionadoParaAdicional.id
+      });
+    } catch (e) {
+      console.error("Erro ao salvar adicional:", e);
+    }
+  }
+
+  // Remover grupo do carrinho
+  function removeFromCart(index){
+    const removed = cart.splice(index,1)[0];
+    renderCart();
+    if(removed) {
+      const label = removed.marca ? `${removed.nome} - ${removed.marca}` : removed.nome;
+      showToast(`Removido: ${label}`);
+    }
+  }
+
+  // Limpar carrinho
+  function clearCart(){
+    cart = [];
+    lancheSelecionadoParaAdicional = null;
+    renderCart();
+    showToast('Carrinho limpo');
+  }
+
+  // Render carrinho
+  function renderCart() {
+    cartItems.innerHTML = '';
+    let total = 0;
+
+    cart.forEach((it, idx) => {
+      const row = document.createElement('div');
+      row.className = 'cart-item';
+
+      const precoBase = Number(it.preco) || 0;
+      let adicionaisTotal = 0;
+      let adicionaisHtml = '';
+
+      if (Array.isArray(it.adicionais) && it.adicionais.length > 0) {
+        adicionaisHtml += `<div style="margin-top:4px; font-size:0.85rem; color:#ccc;">`;
+        it.adicionais.forEach(add => {
+          const p = Number(add.preco) || 0;
+          adicionaisTotal += p;
+          adicionaisHtml += `<div>+ ${add.nome} — R$ ${p.toFixed(2)}</div>`;
+        });
+        adicionaisHtml += `</div>`;
+      }
+
+      const precoGrupo = precoBase + adicionaisTotal;
+      const titulo = it.marca ? `${it.nome} - ${it.marca}` : it.nome;
+
+      const obsHtml = it.observacao
+        ? `<div style="margin-top:6px;font-size:0.85rem;color:#d0d0d0;"><em>Obs:</em> ${it.observacao}</div>`
+        : '';
+
+      row.innerHTML = `
+        <div style="flex:1; display:flex; flex-direction:column;">
+          <span><b>${titulo}</b></span>
+          ${obsHtml}
+          ${adicionaisHtml}
+        </div>
+        <span>R$ ${precoGrupo.toFixed(2)}</span>
+        <button class="btn-remove">Remover</button>
+      `;
+
+      row.querySelector('.btn-remove').onclick = () => removeFromCart(idx);
+      cartItems.appendChild(row);
+
+      total += precoGrupo;
+    });
+
+    totalEl.textContent = total.toFixed(2);
+  }
+
+  // Confirmar mesa
+  document.getElementById('confirmarMesa').onclick = () => {
+    const mesa = document.getElementById('mesaSelect').value;
+    if (!mesa) {
+      showToast("Selecione a mesa!");
+      return;
+    }
+    mesaSelecionada = mesa;
+    document.getElementById('mesaSelect').disabled = true;
+    document.getElementById('confirmarMesa').disabled = true;
+    showToast(`Mesa ${mesaSelecionada} confirmada`);
+  };
+
+  // Atualizar página
+  refreshBtn.onclick = () => location.reload();
+
+  // Limpar carrinho
+  clearCartBtn.onclick = clearCart;
+
+  // Voltar ao topo
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > 50) {
+      backToTopBtn.classList.add("show");
+    } else {
+      backToTopBtn.classList.remove("show");
+    }
+  });
+  backToTopBtn.onclick = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Inicializar
+  renderTabs();
+</script>
+
 </body>
 </html>
